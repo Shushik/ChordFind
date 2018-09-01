@@ -64,6 +64,13 @@ var ChordFind = ChordFind || (function() {
         }
 
         /**
+         * @member {string} title
+         */
+        get title() {
+            return this._data.chord.name;
+        }
+
+        /**
          * @member {object} tune
          */
         get tune() {
@@ -104,7 +111,7 @@ var ChordFind = ChordFind || (function() {
 
             this._data.chord = {
                 cursor : 0,
-                name : Harmony.parseChordName(name),
+                name : Harmony.parseCommonSigns(name),
                 notes : null,
                 list : [],
                 fingers : Self.MAXIMUM_FINGERS_LIMIT
@@ -175,14 +182,16 @@ var ChordFind = ChordFind || (function() {
         /**
          * @private
          * @method _initOffsets
+         *
+         * @param {number} first
          */
-        _initOffsets() {
+        _initOffsets(first) {
             // Initiate object
             this._data.offsets = {
                 next : 0,
                 move : 0,
                 limit : 0,
-                cursor : 0
+                cursor : first
             };
 
             // Get maximum frets slice width
@@ -294,8 +303,27 @@ var ChordFind = ChordFind || (function() {
          * @param {boolean} initial
          */
         _search(initial = '', barre = false) {
+            var
+                it0 = this._data.strings.length,
+                seek = 1,
+                first = 0,
+                tonic = '',
+                string = null;
+
             if (initial) {
-                this._initOffsets();
+                if (barre) {
+                    while (--it0 > -1) {
+                        tonic = this._data.chord.notes[0];
+                        string = this._data.strings[it0];
+                        seek = string.indexOf(tonic);
+
+                        if (seek && seek > -1) {
+                            first = first ? Math.min(first, seek) : seek;
+                        }
+                    }
+                }
+
+                this._initOffsets(first);
             }
 
             this._initSlice();
@@ -460,7 +488,8 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
-            this._data.offsets.next = barre ? 1 : next + 1;
+            this._data.offsets.next = next + (barre ? 0 : 1);
+//             this._data.offsets.next = barre ? 2 : next + 1;
 
             this._data.chord.list.push(chord);
         }
