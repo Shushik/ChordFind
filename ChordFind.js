@@ -86,23 +86,12 @@ var ChordFind = ChordFind || (function() {
             // No need to go further
             if (typeof args != 'object') {
                 throw new Error('Config should be an object');
-            } else if (!(args.root instanceof HTMLElement)) {
-                throw new Error('Root DOM node for chord doesn`t exist');
             }
 
             // Create data stack
             this._data = {};
 
             this.find(args);
-
-            this._data.chord.list.forEach((item) => {
-                this._view = new ChordView({
-                    title : args.name,
-                    root : args.root,
-                    tune : this._data.tune,
-                    chord : item
-                });
-            });
         }
 
         /**
