@@ -303,14 +303,9 @@ var ChordFind = ChordFind || (function() {
             this._initSlice();
 
             if (this._data.slice) {
+                this._check(barre);
 
-                if (this._data.offsets.cursor || !barre) {
-                    this._check(barre);
-                }
-
-                this._data.offsets.cursor += barre ? 1 : this._data.offsets.next;
-//                 this._data.offsets.cursor += barre ? 1 : this._data.offsets.next;
-//                 this._data.offsets.cursor += this._data.offsets.move;
+                this._data.offsets.cursor += this._data.offsets.next;
 
                 // temp expression
                 this._search('', barre);
@@ -416,6 +411,7 @@ var ChordFind = ChordFind || (function() {
 
             // No need to go further
             if (note != notes) {
+                this._data.offsets.next = 1;
                 return;
             }
 
@@ -460,7 +456,7 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
-            this._data.offsets.next = next;
+            this._data.offsets.next = barre ? 1 : next;
 
             this._data.chord.list.push(chord);
         }
