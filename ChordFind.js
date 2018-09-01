@@ -33,7 +33,7 @@ var ChordFind = ChordFind || (function() {
          * @const {number} MAXIMUM_FRETS_LIMIT
          */
         static get MAXIMUM_FRETS_LIMIT() {
-            return 13;
+            return 16;
         }
 
         /**
@@ -94,6 +94,15 @@ var ChordFind = ChordFind || (function() {
             this._data = {};
 
             this.find(args);
+
+            this._data.chord.list.forEach((item) => {
+                this._view = new ChordView({
+                    title : args.name,
+                    root : args.root,
+                    tune : this._data.tune,
+                    chord : item
+                });
+            });
         }
 
         /**
@@ -340,6 +349,12 @@ var ChordFind = ChordFind || (function() {
 
             // Add barre mark
             if (barre) {
+                // No need to go further
+                if (!this._data.offsets.cursor) {
+                    this._data.offsets.next = 1;
+                    return;
+                }
+
                 chord.push({
                     barre : true,
                     to : this._data.offsets.cursor
@@ -456,7 +471,7 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
-            this._data.offsets.next = barre ? 1 : next;
+            this._data.offsets.next = barre ? 1 : next + 1;
 
             this._data.chord.list.push(chord);
         }
