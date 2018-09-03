@@ -305,22 +305,28 @@ var ChordFind = ChordFind || (function() {
         _search(initial = '', barre = false) {
             var
                 it0 = this._data.strings.length,
-                seek = 1,
+                seek = -1,
                 first = 0,
                 tonic = '',
                 string = null;
 
             if (initial) {
-                if (barre) {
-                    while (--it0 > -1) {
-                        tonic = this._data.chord.notes[0];
-                        string = this._data.strings[it0];
-                        seek = string.indexOf(tonic);
+                tonic = this._data.chord.notes[0];
 
-                        if (seek && seek > -1) {
-                            first = first ? Math.min(first, seek) : seek;
-                        }
+                while (--it0 > -1) {
+                    string = this._data.strings[it0];
+                    seek = string.indexOf(tonic);
+
+                    if (!barre && seek > -1) {
+                        first = Math.min(first, seek);
+                    } else if (barre && seek > 0) {
+                        first = first ? Math.min(first, seek) : seek;
                     }
+                }
+
+                // No need to go further
+                if (first == -1) {
+                    return;
                 }
 
                 this._initOffsets(first);
@@ -488,8 +494,12 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
+            // No need to go further
+            if (this._data.offsets !== 0 && fingers == Self.MAXIMUM_FINGERS_LIMIT) {
+                return;
+            }
+
             this._data.offsets.next = next + (barre ? 0 : 1);
-//             this._data.offsets.next = barre ? 2 : next + 1;
 
             this._data.chord.list.push(chord);
         }
