@@ -16,9 +16,9 @@
 
 	Example
 
-	<script src="static/js/Harmony.js"></script> <!-- https://github.com/Shushik/Harmony -->
-	<script src="static/js/ChordView.js"></script> <!-- https://github.com/Shushik/ChordView -->
-	<script src="static/js/ChordFind.js"></script>
+	<script src="Harmony.js"></script> <!-- https://github.com/Shushik/Harmony -->
+	<script src="ChordView.js"></script> <!-- https://github.com/Shushik/ChordView -->
+	<script src="ChordFind.js"></script>
 	<script>
 	    var name = 'G';
 	//      var ukulele = ['A', 'E', 'C', 'G'];
@@ -38,7 +38,7 @@
 	            root.innerHTML = '';
 
 	            chords.found.forEach((item) => {
-	                this._view = new ChordView({
+	                new ChordView({
 	                    title : chords.title,
 	                    root : root,
 	                    tune : tune,
