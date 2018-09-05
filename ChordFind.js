@@ -22,6 +22,14 @@ var ChordFind = ChordFind || (function() {
 
         /**
          * @static
+         * @const {number} BARRE_FINGERS_LIMIT
+         */
+        static get BARRE_FINGERS_LIMIT() {
+            return 3;
+        }
+
+        /**
+         * @static
          * @const {number} MAXIMUM_FINGERS_LIMIT
          */
         static get MAXIMUM_FINGERS_LIMIT() {
@@ -81,7 +89,24 @@ var ChordFind = ChordFind || (function() {
          * @member {object} found
          */
         get found() {
-            return this._data.chord.list;
+            return [].concat(
+                this.foundPure,
+                this.foundBarre
+            );
+        }
+
+        /**
+         * @member {object} foundPure
+         */
+        get foundPure() {
+            return this._data.chord.pure;
+        }
+
+        /**
+         * @member {object} foundBarre
+         */
+        get foundBarre() {
+            return this._data.chord.barre;
         }
 
         /**
@@ -113,7 +138,8 @@ var ChordFind = ChordFind || (function() {
                 cursor : 0,
                 name : Harmony.parseCommonSigns(name),
                 notes : null,
-                list : [],
+                pure : [],
+                barre : [],
                 fingers : Self.MAXIMUM_FINGERS_LIMIT
             };
 
@@ -205,15 +231,7 @@ var ChordFind = ChordFind || (function() {
                 this._data.offsets.limit = Self.MAXIMUM_FRETS_WIDTH;
             }
 
-            // Get frets slice move width
-            this._data.offsets.move = 1;
-/*
-            this._data.offsets.move = Math.floor(this._data.offsets.limit / 2);
-            this._data.offsets.move = this._data.offsets.move > Self.MAXIMUM_FRETS_WIDTH ?
-                                      Self.MAXIMUM_FRETS_WIDTH :
-                                      this._data.offsets.move;
-*/
-
+            // Get frets slice
             this._data.slice = null;
         }
 
@@ -359,7 +377,7 @@ var ChordFind = ChordFind || (function() {
                 note = 0,
                 seek = -1,
                 notes = this._data.chord.notes.length,
-                fingers = Self.MAXIMUM_FINGERS_LIMIT,
+                fingers = barre ? Self.BARRE_FINGERS_LIMIT : Self.MAXIMUM_FINGERS_LIMIT,
                 strings = this._data.strings.length,
                 correction = barre ? -1 : 0,
                 free = {},
@@ -382,8 +400,6 @@ var ChordFind = ChordFind || (function() {
                     barre : true,
                     to : this._data.offsets.cursor
                 });
-
-                fingers--;
             }
 
             // Find very base sound (tonic)
@@ -449,7 +465,7 @@ var ChordFind = ChordFind || (function() {
 
             // No need to go further
             if (note != notes) {
-                this._data.offsets.next = 1;
+//                 this._data.offsets.next += 1;
                 return;
             }
 
@@ -482,7 +498,7 @@ var ChordFind = ChordFind || (function() {
                         }
                     }
 
-                    //
+                    // 
                     if (free[it0]) {
                         chord.push({
                             inactive : true,
@@ -495,13 +511,20 @@ var ChordFind = ChordFind || (function() {
             }
 
             // No need to go further
-            if (this._data.offsets !== 0 && fingers == Self.MAXIMUM_FINGERS_LIMIT) {
+            if (this._data.offsets.cursor !== 0 && fingers == Self.MAXIMUM_FINGERS_LIMIT) {
+//                 this._data.offsets.next += 1;
                 return;
             }
 
+            // Set next chord seeking position
             this._data.offsets.next = next + (barre ? 0 : 1);
 
-            this._data.chord.list.push(chord);
+            // Save chord into barre or pure chords stack
+            if (barre) {
+                this._data.chord.barre.push(chord);
+            } else {
+                this._data.chord.pure.push(chord);
+            }
         }
 
         /**
