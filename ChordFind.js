@@ -115,15 +115,13 @@ var ChordFind = ChordFind || (function() {
          * @param {object} args
          */
         constructor(args = {}) {
-            // No need to go further
-            if (typeof args != 'object') {
-                throw new Error('Config should be an object');
-            }
-
             // Create data stack
             this._data = {};
 
-            this.find(args);
+            // Run chord search immediately
+            if (typeof args == 'object' && args.name && args.tune) {
+                this.find(args);
+            }
         }
 
         /**
@@ -134,6 +132,7 @@ var ChordFind = ChordFind || (function() {
             var
                 notes = Harmony.getChord(name);
 
+            // Initial chord object
             this._data.chord = {
                 cursor : 0,
                 name : Harmony.parseCommonSigns(name),
@@ -328,6 +327,8 @@ var ChordFind = ChordFind || (function() {
                 tonic = '',
                 string = null;
 
+            // Try to reach a first search position via
+            // chord tonic sound seeking
             if (initial) {
                 tonic = this._data.chord.notes[0];
 
@@ -347,18 +348,24 @@ var ChordFind = ChordFind || (function() {
                     return;
                 }
 
+                // Set offsets properties
                 this._initOffsets(first);
             }
 
+            // «Slice» strings for needed number of frets
             this._initSlice();
 
+            // Search chord in current position
             if (this._data.slice) {
                 this._check(barre);
 
+                // Set next cursor value
                 this._data.offsets.cursor += this._data.offsets.next;
 
-                // temp expression
-                this._search('', barre);
+                // Recursion
+                if (this._data.offsets.next) {
+                    this._search('', barre);
+                }
             }
         }
 
@@ -396,23 +403,26 @@ var ChordFind = ChordFind || (function() {
                     return;
                 }
 
+                // Set barre mark
                 chord.push({
                     barre : true,
                     to : this._data.offsets.cursor
                 });
             }
 
-            // Find very base sound (tonic)
+            // Find very base chord sound (tonic)
             it0 = strings;
 
             while (--it0 > -1) {
                 string = slice[it0];
                 seek = string.indexOf(this._data.chord.notes[0]);
 
+                // Sound found
                 if (base == -1 && seek > -1) {
                     base = it0;
                     next = Math.max(next, seek);
 
+                    // Set finger mark
                     if (seek) {
                         chord.push({
                             at : it0 + 1,
@@ -430,7 +440,7 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
-            // Find other base sounds
+            // Find other base chord sounds
             it0 = 0;
 
             while (++it0 < notes) {
@@ -440,9 +450,11 @@ var ChordFind = ChordFind || (function() {
                     string = slice[it1];
                     seek = string.indexOf(this._data.chord.notes[it0]);
 
+                    // Sound found
                     if (seek > -1 && free[it1] && !found[it0]) {
                         next = Math.max(next, seek);
 
+                        // Set finger mark
                         if (seek && fingers) {
                             chord.push({
                                 at : it1 + 1,
@@ -465,11 +477,10 @@ var ChordFind = ChordFind || (function() {
 
             // No need to go further
             if (note != notes) {
-//                 this._data.offsets.next += 1;
                 return;
             }
 
-            // Find rest of sounds
+            // Find rest of chord sounds
             it0 = strings;
 
             while (--it0 > -1) {
@@ -480,9 +491,11 @@ var ChordFind = ChordFind || (function() {
                     while (it0 < base && ++it1 < notes) {
                         seek = string.indexOf(this._data.chord.notes[it1]);
 
+                        // Sound found
                         if (seek > -1) {
                             next = Math.max(next, seek);
 
+                            // Set finger mark
                             if (seek && fingers) {
                                 chord.push({
                                     at : it0 + 1,
@@ -498,7 +511,7 @@ var ChordFind = ChordFind || (function() {
                         }
                     }
 
-                    // 
+                    // Set disabled string mark
                     if (free[it0]) {
                         chord.push({
                             inactive : true,
@@ -511,8 +524,10 @@ var ChordFind = ChordFind || (function() {
             }
 
             // No need to go further
-            if (this._data.offsets.cursor !== 0 && fingers == Self.MAXIMUM_FINGERS_LIMIT) {
-//                 this._data.offsets.next += 1;
+            if (
+                this._data.offsets.cursor !== 0 &&
+                fingers == Self.MAXIMUM_FINGERS_LIMIT
+            ) {
                 return;
             }
 
@@ -535,14 +550,30 @@ var ChordFind = ChordFind || (function() {
          * @returns {object}
          */
         find(args) {
+/*
+            var
+                it0 = -1,
+                ln0 = 0;
+*/
+
             this._initHarmony(args.name, args.tune);
             this._initStrings();
             this._initChord(args.name);
 
-            if (args.name) {
-                this._search(args.name);
-                this._search(args.name, true);
-            }
+            /**
+             * @todo Add chord alteration logic
+             */
+/*
+            ln0 = this._data.chord.notes.length;
+            while (++it0 < ln0) {
+*/
+                if (args.name) {
+                    this._search(args.name);
+                    this._search(args.name, true);
+                }
+/*
+             }
+*/
 
             return this._data.chord.list;
         }
