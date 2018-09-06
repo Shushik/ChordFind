@@ -127,6 +127,9 @@ var ChordFind = ChordFind || (function() {
         /**
          * @private
          * @method _initChord
+         *
+         * @param {string} name
+         * @param {number} offset
          */
         _initChord(name) {
             var
@@ -550,30 +553,32 @@ var ChordFind = ChordFind || (function() {
          * @returns {object}
          */
         find(args) {
-/*
             var
                 it0 = -1,
-                ln0 = 0;
-*/
+                ln0 = 1;
 
             this._initHarmony(args.name, args.tune);
             this._initStrings();
             this._initChord(args.name);
 
-            /**
-             * @todo Add chord alteration logic
-             */
-/*
-            ln0 = this._data.chord.notes.length;
+            // 
+            if (args.alterated) {
+                ln0 = this._data.chord.notes.length;
+            }
+
             while (++it0 < ln0) {
-*/
+                if (it0) {
+                    this._data.chord.notes = Harmony.alterChord(
+                        this._data.chord.notes,
+                        it0
+                    );
+                }
+
                 if (args.name) {
                     this._search(args.name);
                     this._search(args.name, true);
                 }
-/*
-             }
-*/
+            }
 
             return this._data.chord.list;
         }
