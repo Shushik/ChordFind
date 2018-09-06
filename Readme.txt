@@ -20,6 +20,7 @@
 	<script src="ChordView.js"></script> <!-- https://github.com/Shushik/ChordView -->
 	<script src="ChordFind.js"></script>
 	<script>
+	    var alterated = true;
 	    var name = 'G';
 	//      var ukulele = ['A', 'E', 'C', 'G'];
 	    var ukulele = ['E', 'B', 'G', 'D'];
@@ -31,6 +32,7 @@
 	        find(name, tune) {
 	            var root = document.querySelector('.song__scroll');
 	            var chords = new ChordFind({
+    	            alterated : alterated,
 	                name : name,
 	                tune : tune
 	            });
