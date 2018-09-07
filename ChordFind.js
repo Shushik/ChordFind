@@ -6,6 +6,8 @@
  * @license MIT
  *
  * @class ChordFind
+ *
+ * @requires Harmony (https://github.com/Shushik/Harmony)
  */
 var ChordFind = ChordFind || (function() {
 
@@ -441,11 +443,11 @@ var ChordFind = ChordFind || (function() {
                 } else {
                     free[it0] = true;
                 }
-            }
 
-            // Put thumb for bass only
-            if (fingers == Self.MAXIMUM_FINGERS_LIMIT) {
-                fingers--;
+                // Put thumb for bass only
+                if (it0 < strings && fingers == Self.MAXIMUM_FINGERS_LIMIT) {
+                    fingers--;
+                }
             }
 
             // Find other base chord sounds
