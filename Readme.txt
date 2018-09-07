@@ -19,8 +19,13 @@
 	<script src="ChordView.js"></script> <!-- https://github.com/Shushik/ChordView -->
 	<script src="ChordFind.js"></script>
 	<script>
+	    // Show alterated chords too
 	    var alterated = true;
+
+	    // Chord name
 	    var name = 'A6';
+
+	    // Different instruments tunings
 	    var guitarBass4 = ['G', 'D', 'A', 'E'];
 	    var guitarBass5 = ['G', 'D', 'A', 'E', 'B'];
 	    var guitarBass6 = ['B', 'G', 'D', 'A', 'E', 'B'];
