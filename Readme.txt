@@ -21,18 +21,21 @@
 	<script src="ChordFind.js"></script>
 	<script>
 	    var alterated = true;
-	    var name = 'G';
-	//      var ukulele = ['A', 'E', 'C', 'G'];
-	    var ukulele = ['E', 'B', 'G', 'D'];
-	    var guitarClassic = ['E', 'B', 'G', 'D', 'A', 'E'];
+	    var name = 'A6';
+	    var guitarBass4 = ['G', 'D', 'A', 'E'];
+	    var guitarBass5 = ['G', 'D', 'A', 'E', 'B'];
+	    var guitarBass6 = ['B', 'G', 'D', 'A', 'E', 'B'];
 	    var guitarOpenG = ['D', 'G', 'D', 'B', 'G', 'D'];
+	    var guitarClassic = ['E', 'B', 'G', 'D', 'A', 'E'];    
 	    var guitarRussian = ['D', 'B', 'G', 'D', 'B', 'G', 'D'];
+	    var guitarUkulele1 = ['A', 'E', 'C', 'G'];
+	    var guitarUkulele2 = ['E', 'B', 'G', 'D'];
 
 	    function
 	        find(name, tune) {
 	            var root = document.querySelector('.song__scroll');
 	            var chords = new ChordFind({
-    	            alterated : alterated,
+	                alterated : alterated,
 	                name : name,
 	                tune : tune
 	            });

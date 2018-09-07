@@ -33,7 +33,7 @@ var ChordFind = ChordFind || (function() {
          * @const {number} MAXIMUM_FINGERS_LIMIT
          */
         static get MAXIMUM_FINGERS_LIMIT() {
-            return 4;
+            return 5;
         }
 
         /**
@@ -99,14 +99,14 @@ var ChordFind = ChordFind || (function() {
          * @member {object} foundPure
          */
         get foundPure() {
-            return this._data.chord.pure;
+            return this._data.chord.pure.map((item) => {return JSON.parse(item)});
         }
 
         /**
          * @member {object} foundBarre
          */
         get foundBarre() {
-            return this._data.chord.barre;
+            return this._data.chord.barre.map((item) => {return JSON.parse(item)});
         }
 
         /**
@@ -443,6 +443,11 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
+            // Put thumb for bass only
+            if (fingers == Self.MAXIMUM_FINGERS_LIMIT) {
+                fingers--;
+            }
+
             // Find other base chord sounds
             it0 = 0;
 
@@ -500,12 +505,19 @@ var ChordFind = ChordFind || (function() {
 
                             // Set finger mark
                             if (seek && fingers) {
-                                chord.push({
-                                    at : it0 + 1,
-                                    to : seek + this._data.offsets.cursor
-                                });
+                                if (fingers) {
+                                    chord.push({
+                                        at : it0 + 1,
+                                        to : seek + this._data.offsets.cursor
+                                    });
 
-                                fingers--;
+                                    fingers--;
+                                } else {
+                                    chord.push({
+                                        inactive : true,
+                                        at : it0 + 1
+                                    });
+                                }
                             }
 
                             delete free[it0];
@@ -534,15 +546,31 @@ var ChordFind = ChordFind || (function() {
                 return;
             }
 
-            // Set next chord seeking position
-            this._data.offsets.next = next + (barre ? 0 : 1);
+            // Sort chord via strings numbers
+            chord.sort((a, b) => {
+                if (a.at && b.at) {
+                    if (a.at > b.at) {
+                        return 1;
+                    } else if (a.at < b.at) {
+                        return -1;
+                    }
+                }
+
+                return 0;
+            });
+
+            // Prepare JSON string for chord
+            chord = JSON.stringify(chord);
 
             // Save chord into barre or pure chords stack
-            if (barre) {
+            if (barre && this._data.chord.barre.indexOf(chord) == -1) {
                 this._data.chord.barre.push(chord);
-            } else {
+            } else if (!barre && this._data.chord.pure.indexOf(chord) == -1) {
                 this._data.chord.pure.push(chord);
             }
+
+            // Set next chord seeking position
+            this._data.offsets.next = next + (barre ? 0 : 1);
         }
 
         /**
@@ -580,7 +608,7 @@ var ChordFind = ChordFind || (function() {
                 }
             }
 
-            return this._data.chord.list;
+            return this.found;
         }
 
     }
