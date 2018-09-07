@@ -4,8 +4,7 @@
 
 	Goods
 
-	— Simple usage;
-	— Doesn't need any other JavaScript libraries.
+	— Simple usage
 
 
 	System requirements
