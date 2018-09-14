@@ -1,5 +1,6 @@
 
 	Guitar chords finder
+	Working example: http://www.silkleo.ru/fun/chordFind/
 
 
 	Goods
